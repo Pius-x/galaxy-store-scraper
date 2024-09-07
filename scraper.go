@@ -12,6 +12,8 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+const PageNotFound = "404 Page Not Found"
+
 // SamsungAppLookup 查询三星商店应用信息
 func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 	lookupUrl := fmt.Sprintf("https://galaxystore.samsung.com/detail/%s?%d", bid, time.Now().Unix())
@@ -37,8 +39,12 @@ func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 				}()
 				if event.RequestID == id {
 					err = chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
-						if detailBody, err = network.GetResponseBody(id).Do(ctx); err != nil {
+						detailBody, err = network.GetResponseBody(id).Do(ctx)
+						if err != nil {
 							return err
+						}
+						if len(detailBody) == 0 {
+							return fmt.Errorf("empty body")
 						}
 						return nil
 					}))
@@ -52,7 +58,7 @@ func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 				id = event.RequestID
 			} else if strings.Contains(resp.URL, lookupUrl) {
 				if resp.Status == 404 {
-					id = "request 404"
+					id = PageNotFound
 				}
 			}
 		}
@@ -71,8 +77,15 @@ func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 		return data, errors.New("request timeout: samsung app lookup req")
 	}
 
-	if err != nil || len(detailBody) == 0 {
+	if err != nil {
 		return data, err
+	}
+
+	if len(detailBody) == 0 {
+		if id == PageNotFound {
+			return data, err
+		}
+		return data, fmt.Errorf("empty detail body")
 	}
 
 	if err = sonic.Unmarshal(detailBody, &data); err != nil {
