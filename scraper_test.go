@@ -10,13 +10,13 @@ import (
 func TestSamsungAppLookupOnline(t *testing.T) {
 	gotData, err := SamsungAppLookup("com.igg.samsung.lordsmobile")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("err1: ", err)
 		return
 	}
 
 	marshal, err := sonic.MarshalString(gotData)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("err2: ", err)
 		return
 	}
 	fmt.Println(marshal)

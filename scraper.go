@@ -34,8 +34,6 @@ func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 						err = fmt.Errorf("Panic: %v\n", r)
 					}
 					done <- true
-
-					cancel()
 				}()
 				if event.RequestID == id {
 					err = chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
@@ -61,12 +59,15 @@ func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 	})
 
 	if err = chromedp.Run(ctx, chromedp.Navigate(lookupUrl)); err != nil {
+		cancel()
 		return data, err
 	}
 
 	select {
 	case <-done: // finished
+		cancel()
 	case <-time.After(10 * time.Second): // timeout
+		cancel()
 		return data, errors.New("request timeout: samsung app lookup req")
 	}
 
