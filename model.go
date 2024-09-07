@@ -102,4 +102,5 @@ type SamsungApp struct {
 		ReportNumber        any    `json:"reportNumber"`
 	} `json:"SellerInfo"`
 	CommentListTotalCount string `json:"commentListTotalCount"`
+	DetailUrl             string `json:"detailUrl"`
 }

@@ -78,5 +78,7 @@ func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 		return data, err
 	}
 
+	data.DetailUrl = lookupUrl
+
 	return data, err
 }
