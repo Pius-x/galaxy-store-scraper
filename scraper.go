@@ -12,6 +12,7 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+// SamsungAppLookup 查询三星商店应用信息
 func SamsungAppLookup(bid string) (data SamsungApp, err error) {
 	lookupUrl := fmt.Sprintf("https://galaxystore.samsung.com/detail/%s?%d", bid, time.Now().Unix())
 	listenPath := fmt.Sprintf("api/detail/%s", bid)
